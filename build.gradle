@@ -1,5 +1,8 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+    id("com.diffplug.spotless") version "7.0.2"
 }
 
 group = 'org.smc4j'
@@ -15,6 +18,97 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+def loadEnv() {
+    def envFile = file(".env")
+    if (envFile.exists()) {
+        envFile.eachLine { line ->
+            if (line && !line.startsWith("#") && line.contains("=")) {
+                def parts = line.split("=", 2)
+                if (parts.length == 2) {
+                    def key = parts[0].trim()
+                    def value = parts[1].trim()
+                    ext.set(key, value)
+                }
+            }
+        }
+    }
+}
+
+
+loadEnv()
+
+publishing {
+    publications {
+        create("mavenJava", MavenPublication) {
+            groupId = project.group
+            artifactId = "smc4j-lib"
+            version = project.version
+
+            pom {
+                name = "smc4j"
+                description = "A Java library for Smart Money Concepts (SMC) analysis on OHLC data."
+                url = "https://github.com/smc4j/smc4j"
+
+                licenses {
+                    license {
+                        name = "Apache License, Version 2.0"
+                        url = "https://www.apache.org/licenses/LICENSE-2.0"
+                        distribution = "repo"
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = "dharamadev"
+                        name = "Dharmendra Awasthi"
+                        email = "er.dharamk@gmail.com"
+                    }
+                }
+
+                scm {
+                    connection = "scm:git:git://github.com/smc4j/smc4j.git"
+                    developerConnection = "scm:git:ssh://github.com:smc4j/smc4j.git"
+                    url = "https://github.com/smc4j/smc4j"
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/smc4j/smc4j")
+            credentials {
+                username = project.findProperty("GPR_USER") ?: System.getenv("GPR_USER")
+                password = project.findProperty("GPR_KEY") ?: System.getenv("GPR_KEY")
+            }
+        }
+    }
+}
+
+spotless {
+    java {
+        target 'src/*/java/**/*.java'
+        importOrder()
+        removeUnusedImports()
+        leadingTabsToSpaces(4)
+        trimTrailingWhitespace()
+        palantirJavaFormat()
+    }
+}
+
 test {
     useJUnitPlatform()
 }
+
+tasks.withType(JavaCompile).configureEach {
+    options.annotationProcessorPath = configurations.annotationProcessor
+}
+
