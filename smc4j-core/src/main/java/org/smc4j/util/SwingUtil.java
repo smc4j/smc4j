@@ -35,18 +35,16 @@ public class SwingUtil {
             List<Candle> data, int length, BiPredicate<Double, Double> comparator, Function<Candle, Double> extractor) {
 
         int n = data.size();
-        if (n < 2 * length + 1) return List.of(); // not enough candles
 
-        // Pre-extract values for faster access
+        if (n < 2 * length + 1) return List.of();
+
         double[] values = data.stream().mapToDouble(extractor::apply).toArray();
 
         List<Integer> swings = new ArrayList<>();
 
-        // Main loop
         for (int i = length; i < n - length; i++) {
             double center = values[i];
 
-            // Check left and right neighbors in one loop
             boolean isSwing = true;
             for (int offset = 1; offset <= length; offset++) {
                 if (!comparator.test(center, values[i - offset]) || !comparator.test(center, values[i + offset])) {
