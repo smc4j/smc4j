@@ -134,7 +134,7 @@ Replace `PriceData` with your actual market data input. Refer to the [GitHub rep
 
 The SMC4J library is built and tested using GitHub Actions to ensure reliability and compatibility. Below is the status of the latest build:
 
-![GitHub Actions Build Status](https://github.com/smc4j/smc4j/actions/workflows/build.yml/badge.svg)
+![GitHub Actions Build Status](https://github.com/smc4j/smc4j/actions/workflows/gradle.yml/badge.svg)
 
 Check the [GitHub Actions page](https://github.com/smc4j/smc4j/actions) for detailed build logs and results.
 
