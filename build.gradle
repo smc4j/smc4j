@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
     id 'signing'
     id("com.diffplug.spotless") version "7.0.2"
+    id 'jacoco'
 }
 
 group = 'org.smc4j'
@@ -13,6 +14,12 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.0'
+
+    testImplementation 'org.mockito:mockito-core:5.13.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.13.0'
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -106,6 +113,27 @@ spotless {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacoco/html')
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(
+                    dir: it,
+                    exclude: [
+                            'org/smc4j/model/**'
+                    ]
+            )
+        })
+        )
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
