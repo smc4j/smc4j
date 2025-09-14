@@ -1,12 +1,61 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
-group = 'org.smc4j.core'
-version = '1.0-SNAPSHOT'
+group = "org.smc4j"
+version = "0.0.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        register("mavenJava", MavenPublication) {
+            artifactId = "smc4j-lib"
+            from components.java
+
+            pom {
+                name.set("smc4j")
+                description.set("A Java library for Smart Money Concepts (SMC) analysis on OHLC data.")
+                url.set("https://github.com/smc4j/smc4j")
+                licenses {
+                    license {
+                        name.set("Apache License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                        distribution.set("repo")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("dharamadev")
+                        name.set("Dharmendra Awasthi")
+                        email.set("er.dharamk@gmail.com")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:git://github.com/smc4j/smc4j.git")
+                    developerConnection.set("scm:git:ssh://github.com:smc4j/smc4j.git")
+                    url.set("https://github.com/smc4j/smc4j")
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/smc4j/smc4j")
+            credentials {
+                username = findProperty("GPR_USER") ?: System.getenv("GPR_USER")
+                password = findProperty("GPR_KEY") ?: System.getenv("GPR_KEY")
+            }
+        }
+    }
 }
 
 dependencies {
