@@ -1,0 +1,45 @@
+import java.time.Year
+
+plugins {
+    id 'java-library'
+    id 'com.diffplug.spotless' version "7.0.2"
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'com.diffplug.spotless'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+
+    }
+
+    spotless {
+        java {
+            googleJavaFormat('1.17.0')
+            licenseHeader rootProject.file('licenseHeader.txt').text.replace('${YEAR}', Year.now().value.toString())
+            target 'src/*/java/**/*.java'
+            importOrder()
+            removeUnusedImports()
+            leadingTabsToSpaces(4)
+            trimTrailingWhitespace()
+            palantirJavaFormat()
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+
+
+tasks.jar {
+    exclude 'org/smc4j/example/**'
+}

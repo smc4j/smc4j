@@ -1,0 +1,3 @@
+rootProject.name = 'smc4j'
+include 'smc4j-core'
+include 'smc4j-examples'
