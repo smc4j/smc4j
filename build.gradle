@@ -24,7 +24,7 @@ subprojects {
         java {
             googleJavaFormat('1.17.0')
             licenseHeader rootProject.file('licenseHeader.txt').text.replace('${YEAR}', Year.now().value.toString())
-            target 'src/*/java/**/*.java'
+            target '*.java'
             importOrder()
             removeUnusedImports()
             leadingTabsToSpaces(4)
